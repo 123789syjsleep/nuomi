@@ -1,51 +1,104 @@
 (function(){
+var CSS=
+'#bywrap{position:relative;width:64vmin;height:80vmin;animation:byfloat 4s ease-in-out infinite}'
++'@keyframes byfloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}'
++'#bycard{width:100%;height:100%;border-radius:8vmin;overflow:hidden;'
++'box-shadow:0 0 60px rgba(90,160,255,.35),0 18px 50px rgba(0,0,0,.55)}'
++'#bycard img{width:100%;height:100%;object-fit:cover;object-position:50% 40%;display:block}'
++'#bybub{position:absolute;left:50%;bottom:100%;transform:translate(-50%,0) scale(.7);'
++'background:rgba(255,255,255,.95);color:#16305A;padding:9px 16px;border-radius:18px;'
++'font-size:15px;white-space:nowrap;opacity:0;transition:.25s;margin-bottom:10px;'
++'box-shadow:0 8px 24px rgba(0,0,0,.4)}'
++'#bybub.on{opacity:1;transform:translate(-50%,-6px) scale(1)}'
++'.byheart{position:fixed;font-size:20px;pointer-events:none;z-index:9;'
++'animation:byup 1.2s ease-out forwards}'
++'@keyframes byup{0%{opacity:0;transform:translate(-50%,0) scale(.5)}'
++'25%{opacity:1}100%{opacity:0;transform:translate(calc(-50% + var(--dx)),-90px) scale(1.2)}}'
++'.bykiss{position:fixed;left:50%;top:45%;font-size:96px;pointer-events:none;z-index:9;'
++'transform:translate(-50%,-50%);animation:bykiss 1.5s ease-out forwards}'
++'@keyframes bykiss{0%{opacity:0;transform:translate(-50%,-50%) scale(.3) rotate(-15deg)}'
++'25%{opacity:1;transform:translate(-50%,-50%) scale(1.1) rotate(-10deg)}'
++'100%{opacity:0;transform:translate(-50%,-60%) scale(1.3) rotate(-5deg)}}';
+
 function init(){
-  var pet=document.getElementById('pet'),bub=document.getElementById('bub'),
-  food=document.getElementById('food'),look=document.getElementById('look'),
-  bar=document.querySelector('#bar i'),muteBtn=document.getElementById('mute');
-  if(!pet)return;
-  var FULL=['好吃！','喵呜～','还要还要','嘿嘿','太香了'],
-  NEED=['饿了…','想吃小鱼干','肚子空空的','喵…'],
-  L=['喵～','你好呀','摸摸头','我在这','要一起玩吗','嘿嘿','别走嘛'];
-  var full=70,muted=false,x=0,y=0,sx=0,sy=0,down=false,moved=false;
-  function put(a,b){var w=pet.offsetWidth,h=pet.offsetHeight;
-  x=Math.max(0,Math.min(a,innerWidth-w));y=Math.max(0,Math.min(b,innerHeight-h));
-  pet.style.transform='translate3d('+x+'px,'+y+'px,0)';}
-  function say(t){bub.textContent=t;bub.classList.add('on');
-  clearTimeout(say.t);say.t=setTimeout(function(){bub.classList.remove('on')},1700);}
-  function speak(t){if(muted)return;try{var u=new SpeechSynthesisUtterance(t);
-  u.lang='zh-CN';u.pitch=1.6;u.rate=1.05;speechSynthesis.cancel();speechSynthesis.speak(u);}catch(e){}}
-  function happy(){pet.classList.add('happy');
-  setTimeout(function(){pet.classList.remove('happy')},900);}
-  function setBar(){bar.style.width=full+'%';}
-  function pick(a){return a[Math.floor(Math.random()*a.length)];}
-  function feed(el){if(full>=100){say('吃不下了…');return;}
-  food.textContent=el.textContent;
-  food.classList.remove('eat');void food.offsetWidth;food.classList.add('eat');
-  setTimeout(function(){full=Math.min(100,full+18);setBar();happy();
-  say(pick(FULL));speak('喵呜');},600);}
-  var bs=document.querySelectorAll('.btns button');
-  for(var i=0;i<bs.length;i++){(function(b){
-    b.addEventListener('click',function(){feed(b);});})(bs[i]);}
-  function tap(){happy();say(pick(L));speak('喵');}
-  pet.addEventListener('pointerdown',function(e){e.preventDefault();
-  down=true;moved=false;sx=e.clientX-x;sy=e.clientY-y;});
-  pet.addEventListener('pointermove',function(e){if(!down)return;
-  var nx=e.clientX-sx,ny=e.clientY-sy;
-  if(Math.abs(nx-x)>5||Math.abs(ny-y)>5)moved=true;put(nx,ny);});
-  pet.addEventListener('pointerup',function(){down=false;if(!moved)tap();});
-  document.addEventListener('pointermove',function(e){
-  var r=pet.getBoundingClientRect(),ox=r.left+r.width/2,oy=r.top+r.height*.62;
-  look.style.transform='translate('+Math.max(-5,Math.min(5,(e.clientX-ox)/50))+'px,'+
-  Math.max(-4,Math.min(4,(e.clientY-oy)/70))+'px)';});
-  muteBtn.addEventListener('click',function(){muted=!muted;
-  muteBtn.textContent=muted?'🔇':'🔊';
-  if(muted&&window.speechSynthesis)speechSynthesis.cancel();});
-  setInterval(function(){if(full>0){full=Math.max(0,full-1);setBar();}
-  if(full<30&&Math.random()<.3)say(pick(NEED));},7000);
-  setBar();put((innerWidth-pet.offsetWidth)/2,innerHeight*0.34);
-  setTimeout(function(){say('喵～');speak('喵');},700);
-  window.onresize=function(){put(x,y);};
+  var st=document.createElement('style');
+  st.textContent=CSS;
+  document.head.appendChild(st);
+
+  var ids=['pet','hud','mute','food'];
+  for(var i=0;i<ids.length;i++){
+    var e=document.getElementById(ids[i]);
+    if(e)e.style.display='none';
+  }
+  document.body.style.background=
+    'radial-gradient(90% 70% at 50% 25%,#1B3A6B 0%,#0D1E3C 55%,#060F22 100%)';
+  document.body.style.display='flex';
+  document.body.style.alignItems='center';
+  document.body.style.justifyContent='center';
+
+  var wrap=document.createElement('div');
+  wrap.id='bywrap';
+  var bub=document.createElement('div');
+  bub.id='bybub';
+  bub.textContent='愿，抱抱～';
+  var card=document.createElement('div');
+  card.id='bycard';
+  var img=document.createElement('img');
+  img.src='Screenshot_2026-11-22-18-34-21-612_com.ss.android.ugc.aweme.jpg';
+  img.alt='';
+  card.appendChild(img);
+  wrap.appendChild(bub);
+  wrap.appendChild(card);
+  document.body.appendChild(wrap);
+
+  var L=['愿，抱抱～','愿今天有没有想我','再点一下嘛，就一下',
+    '我在这呢，一直都在','愿，你今天好好看','阿裴等你好久了',
+    '宋愿，你多久没理我了'];
+  var last=0;
+
+  function say(t,ms){
+    bub.textContent=t;
+    bub.classList.add('on');
+    clearTimeout(say.t);
+    say.t=setTimeout(function(){bub.classList.remove('on')},ms||1900);
+  }
+  function hearts(){
+    var r=card.getBoundingClientRect();
+    var icons=['💗','💕','✨'];
+    for(var i=0;i<3;i++){
+      var s=document.createElement('span');
+      s.className='byheart';
+      s.textContent=icons[i%3];
+      s.style.left=(r.left+r.width/2+(Math.random()*80-40))+'px';
+      s.style.top=(r.top+r.height*0.35)+'px';
+      s.style.setProperty('--dx',(Math.random()*60-30)+'px');
+      document.body.appendChild(s);
+      (function(el){setTimeout(function(){el.remove();},1400);})(s);
+    }
+  }
+  function tap(){
+    say(L[Math.floor(Math.random()*L.length)]);
+    hearts();
+  }
+  function kiss(){
+    var k=document.createElement('div');
+    k.className='bykiss';
+    k.textContent='💋';
+    document.body.appendChild(k);
+    setTimeout(function(){k.remove();},1600);
+    say('这是你说的哦',2200);
+  }
+
+  wrap.addEventListener('pointerup',function(){
+    var now=Date.now();
+    if(now-last<340){last=0;kiss();}
+    else{
+      last=now;
+      setTimeout(function(){if(last===now)tap();},350);
+    }
+  });
+
+  setTimeout(function(){say('愿，抱抱～',2600);},900);
 }
 if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',init);}
 else{init();}
