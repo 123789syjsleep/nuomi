@@ -78,17 +78,6 @@ font-size:18px;background:#ffffffcc;z-index:30;box-shadow:0 3px 10px #c9a18a33}
 <div id="bar"><i></i></div>
 <div class="btns"><button>🐟</button><button>🍖</button><button>🥛</button></div>
 </div>
-<script>
-(function(){
-function init(){
-  var pet=document.getElementById('pet'),bub=document.getElementById('bub'),
-  food=document.getElementById('food'),look=document.getElementById('look'),
-  bar=document.querySelector('#bar i'),muteBtn=document.getElementById('mute');
-  if(!pet)return;
-  var FULL=['好吃！','喵呜～','还要还要','嘿嘿','太香了'],
-  NEED=['饿了…','想吃小鱼干','肚子空空的','喵…'],
-  L=['喵～','你好呀','摸摸头','我在这','要一起玩吗','嘿嘿','别走嘛'];
-  var full=70,muted=false,x=0,y=0,sx=0,sy=0,down=false,moved=false;
-  function put(a,b){var w=pet.offsetWidth,h=pet.offsetHeight;
-  x=Math.max(0,Math.min(a,innerWidth-w));y=Math.max(0,Math.min(b,innerHeight-h));
-  pet.style.transform='translate3d('
+<script src="pet.js"></script>
+</body>
+</html>
