@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<style>
+*{margin:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{height:100vh;overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none;
+background:radial-gradient(120% 80% at 50% 5%,#FFFAF4,#FCEBDF 55%,#F3DED3)}
+#pet{position:fixed;left:0;top:0;width:58vmin;height:58vmin;cursor:grab}
+svg{width:100%;height:100%;display:block;transform-origin:50% 92%}
+#pet.happy svg{animation:sq .5s}
+@keyframes sq{0%{transform:scale(1,1)}40%{transform:scale(1.12,.87)}100%{transform:scale(1,1)}}
+#body{transform-box:fill-box;transform-origin:center bottom;animation:br 3.4s ease-in-out infinite}
+@keyframes br{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+#tail{transform-box:fill-box;transform-origin:8% 88%;animation:wg 2.4s ease-in-out infinite}
+@keyframes wg{0%,100%{transform:rotate(-6deg)}50%{transform:rotate(9deg)}}
+#eyes{transform-box:fill-box;transform-origin:center;animation:bk 4.5s infinite}
+@keyframes bk{0%,92%,100%{transform:scaleY(1)}95%{transform:scaleY(.08)}}
+#look{transition:transform .12s}
+.h{opacity:0;transition:.15s}
+#pet.happy .h{opacity:1}
+#pet.happy #eyes,#pet.happy #mouth{opacity:0}
+#bub{position:absolute;left:50%;bottom:96%;transform:translate(-50%,0) scale(.6);
+background:#fff;color:#5C4A44;padding:7px 13px;border-radius:14px;font-size:15px;
+white-space:nowrap;opacity:0;transition:.2s;box-shadow:0 4px 14px #c9a18a40}
+#bub.on{opacity:1;transform:translate(-50%,-8px) scale(1)}
+#food{position:absolute;left:50%;top:55%;font-size:28px;opacity:0;pointer-events:none}
+#food.eat{animation:at .8s ease-in forwards}
+@keyframes at{0%{opacity:1;transform:translate(-50%,-70px) scale(1.1)}
+55%{opacity:1;transform:translate(-50%,-8px) scale(1)}
+100%{opacity:0;transform:translate(-50%,0) scale(.15)}}
+#hud{position:fixed;left:0;right:0;bottom:0;display:flex;flex-direction:column;align-items:center;
+gap:12px;padding:10px 16px 26px;z-index:30}
+#bar{width:150px;height:9px;background:#00000014;border-radius:9px;overflow:hidden}
+#bar i{display:block;height:100%;width:70%;background:linear-gradient(90deg,#FFCE98,#FF9C7A);transition:.4s}
+.btns{display:flex;gap:16px}
+.btns button{width:56px;height:56px;border-radius:50%;border:none;font-size:26px;background:#fff;
+box-shadow:0 5px 14px #c9a18a33;line-height:1}
+.btns button:active{transform:scale(.9)}
+#mute{position:fixed;right:14px;top:14px;width:42px;height:42px;border-radius:50%;border:none;
+font-size:18px;background:#ffffffcc;z-index:30;box-shadow:0 3px 10px #c9a18a33}
+</style>
+</head>
+<body>
+<button id="mute">🔊</button>
+<div id="pet">
+<div id="bub">喵～</div>
+<div id="food"></div>
+<svg viewBox="0 0 220 220">
+<ellipse cx="110" cy="204" rx="46" ry="7" fill="#C79E8E" opacity=".18"/>
+<path id="tail" d="M160 172 q42 10 30 -32" fill="none" stroke="#FFE1C6" stroke-width="15" stroke-linecap="round"/>
+<g id="body">
+<path d="M72 88 L60 40 Q58 29 69 32 L108 66 Z" fill="#FFF3E6" stroke="#F0D5BC" stroke-width="3" stroke-linejoin="round"/>
+<path d="M148 88 L160 40 Q162 29 151 32 L112 66 Z" fill="#FFF3E6" stroke="#F0D5BC" stroke-width="3" stroke-linejoin="round"/>
+<path d="M76 79 L68 50 Q67 44 73 47 L96 64 Z" fill="#FFAFBE"/>
+<path d="M144 79 L152 50 Q153 44 147 47 L124 64 Z" fill="#FFAFBE"/>
+<ellipse cx="110" cy="138" rx="64" ry="60" fill="#FFF7EC" stroke="#F0D5BC" stroke-width="3"/>
+<ellipse cx="64" cy="152" rx="14" ry="8" fill="#FF9AAE" opacity=".4"/>
+<ellipse cx="156" cy="152" rx="14" ry="8" fill="#FF9AAE" opacity=".4"/>
+<g id="look">
+<g id="eyes" fill="#3E2D2B">
+<ellipse cx="86" cy="132" rx="10" ry="13"/>
+<ellipse cx="134" cy="132" rx="10" ry="13"/>
+<circle cx="89" cy="127" r="3.6" fill="#fff"/>
+<circle cx="137" cy="127" r="3.6" fill="#fff"/>
+</g>
+<g class="h" fill="none" stroke="#3E2D2B" stroke-width="5" stroke-linecap="round">
+<path d="M76 136 q10 -13 20 -1"/><path d="M124 135 q10 -12 20 1"/>
+</g>
+</g>
+<path id="mouth" d="M101 150 q9 8 18 0" fill="none" stroke="#3E2D2B" stroke-width="4" stroke-linecap="round"/>
+<ellipse id="mouth-h" class="h" cx="110" cy="154" rx="8" ry="7" fill="#FF8FA0"/>
+</g>
+</svg>
+</div>
+<div id="hud">
+<div id="bar"><i></i></div>
+<div class="btns"><button>🐟</button><button>🍖</button><button>🥛</button></div>
+</div>
+<script>
+(function(){
+function init(){
+  var pet=document.getElementById('pet'),bub=document.getElementById('bub'),
+  food=document.getElementById('food'),look=document.getElementById('look'),
+  bar=document.querySelector('#bar i'),muteBtn=document.getElementById('mute');
+  if(!pet)return;
+  var FULL=['好吃！','喵呜～','还要还要','嘿嘿','太香了'],
+  NEED=['饿了…','想吃小鱼干','肚子空空的','喵…'],
+  L=['喵～','你好呀','摸摸头','我在这','要一起玩吗','嘿嘿','别走嘛'];
+  var full=70,muted=false,x=0,y=0,sx=0,sy=0,down=false,moved=false;
+  function put(a,b){var w=pet.offsetWidth,h=pet.offsetHeight;
+  x=Math.max(0,Math.min(a,innerWidth-w));y=Math.max(0,Math.min(b,innerHeight-h));
+  pet.style.transform='translate3d('
